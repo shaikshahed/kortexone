@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "appTitle": "KortexOne Mobile",
+  "loginTitle": "Welcome Back",
+  "loginSubtitle": "Sign in to continue to KortexOne",
+  "emailLabel": "EMAIL",
+  "emailHint": "you@company.com",
+  "passwordLabel": "PASSWORD",
+  "passwordHint": "Enter your password",
+  "forgotPassword": "Forgot password?",
+  "copyright": "© 2026 KortexOne. All rights reserved.",
+  "signInButton": "Sign In",
+  "emptyEmailError": "Email cannot be empty",
+  "invalidEmailError": "Please enter a valid email",
+  "emptyPasswordError": "Password cannot be empty",
+  "passwordTooShortError": "Password must be at least 6 characters"
+}
