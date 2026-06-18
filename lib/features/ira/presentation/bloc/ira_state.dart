@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../../domain/entities/ira_agent.dart';
 import '../../domain/entities/ira_message.dart';
 import '../../domain/entities/ira_file.dart';
+import '../../domain/entities/ira_conversation.dart';
 
 enum IraStatus { initial, loading, success, failure }
 
@@ -19,6 +20,12 @@ class IraState extends Equatable {
   final bool isSending;
   final List<String> suggestions;
   final IraStatus suggestionsStatus;
+  final List<String> liveConnectors;
+  final List<IraConversation> conversations;
+  final IraConversation? selectedConversation;
+  final IraStatus historyStatus;
+  final IraStatus messagesStatus;
+  final IraStatus filesStatus;
 
   const IraState({
     this.status = IraStatus.initial,
@@ -34,6 +41,12 @@ class IraState extends Equatable {
     this.isSending = false,
     this.suggestions = const [],
     this.suggestionsStatus = IraStatus.initial,
+    this.liveConnectors = const [],
+    this.conversations = const [],
+    this.selectedConversation,
+    this.historyStatus = IraStatus.initial,
+    this.messagesStatus = IraStatus.initial,
+    this.filesStatus = IraStatus.initial,
   });
 
   IraState copyWith({
@@ -50,6 +63,13 @@ class IraState extends Equatable {
     bool? isSending,
     List<String>? suggestions,
     IraStatus? suggestionsStatus,
+    List<String>? liveConnectors,
+    List<IraConversation>? conversations,
+    IraConversation? selectedConversation,
+    bool clearSelectedConversation = false,
+    IraStatus? historyStatus,
+    IraStatus? messagesStatus,
+    IraStatus? filesStatus,
   }) {
     return IraState(
       status: status ?? this.status,
@@ -65,6 +85,14 @@ class IraState extends Equatable {
       isSending: isSending ?? this.isSending,
       suggestions: suggestions ?? this.suggestions,
       suggestionsStatus: suggestionsStatus ?? this.suggestionsStatus,
+      liveConnectors: liveConnectors ?? this.liveConnectors,
+      conversations: conversations ?? this.conversations,
+      selectedConversation: clearSelectedConversation
+          ? null
+          : (selectedConversation ?? this.selectedConversation),
+      historyStatus: historyStatus ?? this.historyStatus,
+      messagesStatus: messagesStatus ?? this.messagesStatus,
+      filesStatus: filesStatus ?? this.filesStatus,
     );
   }
 
@@ -83,5 +111,11 @@ class IraState extends Equatable {
         isSending,
         suggestions,
         suggestionsStatus,
+        liveConnectors,
+        conversations,
+        selectedConversation,
+        historyStatus,
+        messagesStatus,
+        filesStatus,
       ];
 }

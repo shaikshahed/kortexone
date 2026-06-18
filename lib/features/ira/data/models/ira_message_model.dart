@@ -12,6 +12,12 @@ abstract class IraMessageModel with _$IraMessageModel {
     required String sender,
     required String text,
     required String timestamp,
+    List<String>? suggestions,
+    String? modelUsed,
+    double? responseTimeMs,
+    String? intent,
+    String? dataSource,
+    String? chatId,
   }) = _IraMessageModel;
 
   factory IraMessageModel.fromJson(Map<String, dynamic> json) =>
@@ -25,5 +31,11 @@ abstract class IraMessageModel with _$IraMessageModel {
         sender: sender == 'user' ? MessageSender.user : MessageSender.assistant,
         text: text,
         timestamp: DateTime.tryParse(timestamp) ?? DateTime.now(),
+        suggestions: suggestions,
+        modelUsed: modelUsed,
+        responseTimeMs: responseTimeMs,
+        intent: intent,
+        dataSource: dataSource,
+        chatId: chatId,
       );
 }

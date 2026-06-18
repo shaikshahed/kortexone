@@ -8,6 +8,12 @@ class IraMessage extends Equatable {
   final MessageSender sender;
   final String text;
   final DateTime timestamp;
+  final List<String>? suggestions;
+  final String? modelUsed;
+  final double? responseTimeMs;
+  final String? intent;
+  final String? dataSource;
+  final String? chatId;
 
   const IraMessage({
     required this.id,
@@ -15,8 +21,26 @@ class IraMessage extends Equatable {
     required this.sender,
     required this.text,
     required this.timestamp,
+    this.suggestions,
+    this.modelUsed,
+    this.responseTimeMs,
+    this.intent,
+    this.dataSource,
+    this.chatId,
   });
 
   @override
-  List<Object?> get props => [id, agentId, sender, text, timestamp];
+  List<Object?> get props => [
+        id,
+        agentId,
+        sender,
+        text,
+        timestamp,
+        suggestions,
+        modelUsed,
+        responseTimeMs,
+        intent,
+        dataSource,
+        chatId,
+      ];
 }

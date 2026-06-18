@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../domain/entities/ira_conversation.dart';
 import 'ira_message_model.dart';
 
 part 'ira_chat_response_model.freezed.dart';
@@ -29,6 +30,16 @@ abstract class IraChatResponseModel with _$IraChatResponseModel {
 }
 
 extension IraChatModelMapper on IraChatModel {
+  IraConversation toEntity() {
+    return IraConversation(
+      id: id,
+      title: title,
+      createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(updatedAt) ?? DateTime.now(),
+      assistantId: assistantId,
+    );
+  }
+
   List<IraMessageModel> toMessageModels() {
     String replyText = '';
     if (assistantId == 'expense' || assistantId == '6a30173adc700605a794a792') {

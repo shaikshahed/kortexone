@@ -6,13 +6,18 @@ import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/ira_file.dart';
 import '../bloc/ira_bloc.dart';
 import '../bloc/ira_event.dart';
+import '../bloc/ira_state.dart';
 
 class FilesView extends StatefulWidget {
   final List<IraFile> files;
+  final IraStatus filesStatus;
+  final VoidCallback onRetry;
 
   const FilesView({
     super.key,
     required this.files,
+    required this.filesStatus,
+    required this.onRetry,
   });
 
   @override
@@ -102,17 +107,9 @@ class _FilesViewState extends State<FilesView> {
           ),
           const SizedBox(height: 12),
 
-          // Files list
+          // Files list or Loading/Error State
           Expanded(
-            child: widget.files.isEmpty
-                ? _buildEmptyState(isDark)
-                : ListView.builder(
-                    itemCount: widget.files.length,
-                    itemBuilder: (context, index) {
-                      final file = widget.files[index];
-                      return _buildFileItem(file, isDark);
-                    },
-                  ),
+            child: _buildFilesContent(isDark),
           ),
 
           // Bottom advice card
@@ -120,6 +117,78 @@ class _FilesViewState extends State<FilesView> {
           _buildInfoCard(isDark),
         ],
       ),
+    );
+  }
+
+  Widget _buildFilesContent(bool isDark) {
+    if (widget.filesStatus == IraStatus.loading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+        ),
+      );
+    }
+
+    if (widget.filesStatus == IraStatus.failure) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: Colors.redAccent,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Something went wrong',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Failed to load files from server. Please try again.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: widget.onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (widget.files.isEmpty) {
+      return _buildEmptyState(isDark);
+    }
+
+    return ListView.builder(
+      itemCount: widget.files.length,
+      itemBuilder: (context, index) {
+        final file = widget.files[index];
+        return _buildFileItem(file, isDark);
+      },
     );
   }
 
@@ -215,22 +284,6 @@ class _FilesViewState extends State<FilesView> {
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 12),
-          IconButton(
-            icon: Icon(
-              Icons.download_rounded,
-              size: 20,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Downloading ${file.name}...'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
           ),
         ],
       ),

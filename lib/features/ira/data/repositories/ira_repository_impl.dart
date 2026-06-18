@@ -5,9 +5,11 @@ import '../../domain/entities/ira_agent.dart';
 import '../../domain/entities/ira_file.dart';
 import '../../domain/entities/ira_message.dart';
 import '../../domain/entities/welcome_suggestions.dart';
+import '../../domain/entities/ira_conversation.dart';
 import '../../domain/repositories/ira_repository.dart';
 import '../datasources/ira_remote_datasource.dart';
 import '../models/welcome_suggestions_request_model.dart';
+import '../models/ira_chat_response_model.dart';
 
 @LazySingleton(as: IraRepository)
 class IraRepositoryImpl implements IraRepository {
@@ -37,7 +39,7 @@ class IraRepositoryImpl implements IraRepository {
   }
 
   @override
-  Future<Either<Failure, List<IraMessage>>> getChatHistory(String agentId) async {
+  Future<Either<Failure, List<IraConversation>>> getChatHistory(String agentId) async {
     try {
       final models = await _remoteDataSource.getChatHistory(agentId);
       final entities = models.map((m) => m.toEntity()).toList();
@@ -59,9 +61,19 @@ class IraRepositoryImpl implements IraRepository {
   }
 
   @override
-  Future<Either<Failure, IraMessage>> sendMessage(String agentId, String text) async {
+  Future<Either<Failure, IraMessage>> sendMessage(
+    String agentId,
+    String text, {
+    String? chatId,
+    String? userEmail,
+  }) async {
     try {
-      final model = await _remoteDataSource.sendMessage(agentId, text);
+      final model = await _remoteDataSource.sendMessage(
+        agentId,
+        text,
+        chatId: chatId,
+        userEmail: userEmail,
+      );
       return Right(model.toEntity());
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -78,6 +90,17 @@ class IraRepositoryImpl implements IraRepository {
         ),
       );
       return Right(model.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<IraMessage>>> getConversationMessages(String conversationId) async {
+    try {
+      final models = await _remoteDataSource.getConversationMessages(conversationId);
+      final entities = models.map((m) => m.toEntity()).toList();
+      return Right(entities);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

@@ -111,22 +111,15 @@ class _ChatComposerState extends State<ChatComposer> {
                           : null,
                     ),
                     child: Center(
-                      child: widget.isSending
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Icon(
-                              Icons.send_rounded,
-                              size: 20,
-                              color: _controller.text.trim().isEmpty
-                                  ? (isDark ? AppColors.textSecondaryDark.withOpacity(0.5) : AppColors.textSecondaryLight.withOpacity(0.5))
-                                  : Colors.white,
-                            ),
+                      child: Icon(
+                        Icons.send_rounded,
+                        size: 20,
+                        color: _controller.text.trim().isEmpty || widget.isSending
+                            ? (isDark
+                                ? AppColors.textSecondaryDark.withOpacity(0.5)
+                                : AppColors.textSecondaryLight.withOpacity(0.5))
+                            : Colors.white,
+                      ),
                     ),
                   ),
                 ),

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$IraMessageModel {
 
- String get id; String get agentId; String get sender; String get text; String get timestamp;
+ String get id; String get agentId; String get sender; String get text; String get timestamp; List<String>? get suggestions; String? get modelUsed; double? get responseTimeMs; String? get intent; String? get dataSource; String? get chatId;
 /// Create a copy of IraMessageModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $IraMessageModelCopyWith<IraMessageModel> get copyWith => _$IraMessageModelCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is IraMessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.agentId, agentId) || other.agentId == agentId)&&(identical(other.sender, sender) || other.sender == sender)&&(identical(other.text, text) || other.text == text)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is IraMessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.agentId, agentId) || other.agentId == agentId)&&(identical(other.sender, sender) || other.sender == sender)&&(identical(other.text, text) || other.text == text)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&const DeepCollectionEquality().equals(other.suggestions, suggestions)&&(identical(other.modelUsed, modelUsed) || other.modelUsed == modelUsed)&&(identical(other.responseTimeMs, responseTimeMs) || other.responseTimeMs == responseTimeMs)&&(identical(other.intent, intent) || other.intent == intent)&&(identical(other.dataSource, dataSource) || other.dataSource == dataSource)&&(identical(other.chatId, chatId) || other.chatId == chatId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,agentId,sender,text,timestamp);
+int get hashCode => Object.hash(runtimeType,id,agentId,sender,text,timestamp,const DeepCollectionEquality().hash(suggestions),modelUsed,responseTimeMs,intent,dataSource,chatId);
 
 @override
 String toString() {
-  return 'IraMessageModel(id: $id, agentId: $agentId, sender: $sender, text: $text, timestamp: $timestamp)';
+  return 'IraMessageModel(id: $id, agentId: $agentId, sender: $sender, text: $text, timestamp: $timestamp, suggestions: $suggestions, modelUsed: $modelUsed, responseTimeMs: $responseTimeMs, intent: $intent, dataSource: $dataSource, chatId: $chatId)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $IraMessageModelCopyWith<$Res>  {
   factory $IraMessageModelCopyWith(IraMessageModel value, $Res Function(IraMessageModel) _then) = _$IraMessageModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String agentId, String sender, String text, String timestamp
+ String id, String agentId, String sender, String text, String timestamp, List<String>? suggestions, String? modelUsed, double? responseTimeMs, String? intent, String? dataSource, String? chatId
 });
 
 
@@ -65,14 +65,20 @@ class _$IraMessageModelCopyWithImpl<$Res>
 
 /// Create a copy of IraMessageModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? agentId = null,Object? sender = null,Object? text = null,Object? timestamp = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? agentId = null,Object? sender = null,Object? text = null,Object? timestamp = null,Object? suggestions = freezed,Object? modelUsed = freezed,Object? responseTimeMs = freezed,Object? intent = freezed,Object? dataSource = freezed,Object? chatId = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,agentId: null == agentId ? _self.agentId : agentId // ignore: cast_nullable_to_non_nullable
 as String,sender: null == sender ? _self.sender : sender // ignore: cast_nullable_to_non_nullable
 as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
-as String,
+as String,suggestions: freezed == suggestions ? _self.suggestions : suggestions // ignore: cast_nullable_to_non_nullable
+as List<String>?,modelUsed: freezed == modelUsed ? _self.modelUsed : modelUsed // ignore: cast_nullable_to_non_nullable
+as String?,responseTimeMs: freezed == responseTimeMs ? _self.responseTimeMs : responseTimeMs // ignore: cast_nullable_to_non_nullable
+as double?,intent: freezed == intent ? _self.intent : intent // ignore: cast_nullable_to_non_nullable
+as String?,dataSource: freezed == dataSource ? _self.dataSource : dataSource // ignore: cast_nullable_to_non_nullable
+as String?,chatId: freezed == chatId ? _self.chatId : chatId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -157,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String agentId,  String sender,  String text,  String timestamp)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String agentId,  String sender,  String text,  String timestamp,  List<String>? suggestions,  String? modelUsed,  double? responseTimeMs,  String? intent,  String? dataSource,  String? chatId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _IraMessageModel() when $default != null:
-return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp);case _:
+return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp,_that.suggestions,_that.modelUsed,_that.responseTimeMs,_that.intent,_that.dataSource,_that.chatId);case _:
   return orElse();
 
 }
@@ -178,10 +184,10 @@ return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp);
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String agentId,  String sender,  String text,  String timestamp)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String agentId,  String sender,  String text,  String timestamp,  List<String>? suggestions,  String? modelUsed,  double? responseTimeMs,  String? intent,  String? dataSource,  String? chatId)  $default,) {final _that = this;
 switch (_that) {
 case _IraMessageModel():
-return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp);case _:
+return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp,_that.suggestions,_that.modelUsed,_that.responseTimeMs,_that.intent,_that.dataSource,_that.chatId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +204,10 @@ return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp);
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String agentId,  String sender,  String text,  String timestamp)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String agentId,  String sender,  String text,  String timestamp,  List<String>? suggestions,  String? modelUsed,  double? responseTimeMs,  String? intent,  String? dataSource,  String? chatId)?  $default,) {final _that = this;
 switch (_that) {
 case _IraMessageModel() when $default != null:
-return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp);case _:
+return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp,_that.suggestions,_that.modelUsed,_that.responseTimeMs,_that.intent,_that.dataSource,_that.chatId);case _:
   return null;
 
 }
@@ -213,7 +219,7 @@ return $default(_that.id,_that.agentId,_that.sender,_that.text,_that.timestamp);
 @JsonSerializable()
 
 class _IraMessageModel extends IraMessageModel {
-  const _IraMessageModel({required this.id, required this.agentId, required this.sender, required this.text, required this.timestamp}): super._();
+  const _IraMessageModel({required this.id, required this.agentId, required this.sender, required this.text, required this.timestamp, final  List<String>? suggestions, this.modelUsed, this.responseTimeMs, this.intent, this.dataSource, this.chatId}): _suggestions = suggestions,super._();
   factory _IraMessageModel.fromJson(Map<String, dynamic> json) => _$IraMessageModelFromJson(json);
 
 @override final  String id;
@@ -221,6 +227,20 @@ class _IraMessageModel extends IraMessageModel {
 @override final  String sender;
 @override final  String text;
 @override final  String timestamp;
+ final  List<String>? _suggestions;
+@override List<String>? get suggestions {
+  final value = _suggestions;
+  if (value == null) return null;
+  if (_suggestions is EqualUnmodifiableListView) return _suggestions;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
+@override final  String? modelUsed;
+@override final  double? responseTimeMs;
+@override final  String? intent;
+@override final  String? dataSource;
+@override final  String? chatId;
 
 /// Create a copy of IraMessageModel
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _IraMessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.agentId, agentId) || other.agentId == agentId)&&(identical(other.sender, sender) || other.sender == sender)&&(identical(other.text, text) || other.text == text)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _IraMessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.agentId, agentId) || other.agentId == agentId)&&(identical(other.sender, sender) || other.sender == sender)&&(identical(other.text, text) || other.text == text)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&const DeepCollectionEquality().equals(other._suggestions, _suggestions)&&(identical(other.modelUsed, modelUsed) || other.modelUsed == modelUsed)&&(identical(other.responseTimeMs, responseTimeMs) || other.responseTimeMs == responseTimeMs)&&(identical(other.intent, intent) || other.intent == intent)&&(identical(other.dataSource, dataSource) || other.dataSource == dataSource)&&(identical(other.chatId, chatId) || other.chatId == chatId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,agentId,sender,text,timestamp);
+int get hashCode => Object.hash(runtimeType,id,agentId,sender,text,timestamp,const DeepCollectionEquality().hash(_suggestions),modelUsed,responseTimeMs,intent,dataSource,chatId);
 
 @override
 String toString() {
-  return 'IraMessageModel(id: $id, agentId: $agentId, sender: $sender, text: $text, timestamp: $timestamp)';
+  return 'IraMessageModel(id: $id, agentId: $agentId, sender: $sender, text: $text, timestamp: $timestamp, suggestions: $suggestions, modelUsed: $modelUsed, responseTimeMs: $responseTimeMs, intent: $intent, dataSource: $dataSource, chatId: $chatId)';
 }
 
 
@@ -255,7 +275,7 @@ abstract mixin class _$IraMessageModelCopyWith<$Res> implements $IraMessageModel
   factory _$IraMessageModelCopyWith(_IraMessageModel value, $Res Function(_IraMessageModel) _then) = __$IraMessageModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String agentId, String sender, String text, String timestamp
+ String id, String agentId, String sender, String text, String timestamp, List<String>? suggestions, String? modelUsed, double? responseTimeMs, String? intent, String? dataSource, String? chatId
 });
 
 
@@ -272,14 +292,20 @@ class __$IraMessageModelCopyWithImpl<$Res>
 
 /// Create a copy of IraMessageModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? agentId = null,Object? sender = null,Object? text = null,Object? timestamp = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? agentId = null,Object? sender = null,Object? text = null,Object? timestamp = null,Object? suggestions = freezed,Object? modelUsed = freezed,Object? responseTimeMs = freezed,Object? intent = freezed,Object? dataSource = freezed,Object? chatId = freezed,}) {
   return _then(_IraMessageModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,agentId: null == agentId ? _self.agentId : agentId // ignore: cast_nullable_to_non_nullable
 as String,sender: null == sender ? _self.sender : sender // ignore: cast_nullable_to_non_nullable
 as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
-as String,
+as String,suggestions: freezed == suggestions ? _self._suggestions : suggestions // ignore: cast_nullable_to_non_nullable
+as List<String>?,modelUsed: freezed == modelUsed ? _self.modelUsed : modelUsed // ignore: cast_nullable_to_non_nullable
+as String?,responseTimeMs: freezed == responseTimeMs ? _self.responseTimeMs : responseTimeMs // ignore: cast_nullable_to_non_nullable
+as double?,intent: freezed == intent ? _self.intent : intent // ignore: cast_nullable_to_non_nullable
+as String?,dataSource: freezed == dataSource ? _self.dataSource : dataSource // ignore: cast_nullable_to_non_nullable
+as String?,chatId: freezed == chatId ? _self.chatId : chatId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

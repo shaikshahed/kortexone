@@ -3,23 +3,35 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/ira_message.dart';
 import '../../domain/entities/ira_file.dart';
+import '../../domain/entities/ira_agent.dart';
+import '../../domain/entities/ira_conversation.dart';
 import '../../domain/usecases/get_agents_usecase.dart';
 import '../../domain/usecases/get_welcome_message_usecase.dart';
 import '../../domain/usecases/get_chat_history_usecase.dart';
 import '../../domain/usecases/get_files_usecase.dart';
 import '../../domain/usecases/send_message_usecase.dart';
 import '../../domain/usecases/get_welcome_suggestions_usecase.dart';
+import '../../domain/usecases/get_conversation_messages_usecase.dart';
 import 'ira_event.dart';
 import 'ira_state.dart';
 
 @injectable
 class IraBloc extends Bloc<IraEvent, IraState> {
+  static const IraAgent defaultAgent = IraAgent(
+    id: '6a2d2459063374a0a19554e7',
+    name: 'HRMS',
+    description: 'HR Management Agent',
+    status: 'Active',
+    iconPath: 'hrms',
+  );
+
   final GetAgentsUseCase _getAgentsUseCase;
   final GetWelcomeMessageUseCase _getWelcomeMessageUseCase;
   final GetChatHistoryUseCase _getChatHistoryUseCase;
   final GetFilesUseCase _getFilesUseCase;
   final SendMessageUseCase _sendMessageUseCase;
   final GetWelcomeSuggestionsUseCase _getWelcomeSuggestionsUseCase;
+  final GetConversationMessagesUseCase _getConversationMessagesUseCase;
 
   IraBloc(
     this._getAgentsUseCase,
@@ -28,12 +40,18 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     this._getFilesUseCase,
     this._sendMessageUseCase,
     this._getWelcomeSuggestionsUseCase,
+    this._getConversationMessagesUseCase,
   ) : super(const IraState()) {
     on<IraLoadInitial>(_onIraLoadInitial);
+    on<IraLoadAgents>(_onIraLoadAgents);
     on<IraSelectAgent>(_onIraSelectAgent);
     on<IraSendMessage>(_onIraSendMessage);
     on<IraSearchFiles>(_onIraSearchFiles);
     on<IraChangeTab>(_onIraChangeTab);
+    on<IraLoadConversations>(_onIraLoadConversations);
+    on<IraSelectConversation>(_onIraSelectConversation);
+    on<IraCreateNewConversation>(_onIraCreateNewConversation);
+    on<IraLoadFiles>(_onIraLoadFiles);
   }
 
   Future<void> _onIraLoadInitial(
@@ -43,71 +61,81 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     emit(state.copyWith(
       status: IraStatus.loading,
       suggestionsStatus: IraStatus.loading,
+      historyStatus: IraStatus.loading,
+      filesStatus: IraStatus.loading,
+      selectedAgent: defaultAgent,
+      agents: const [defaultAgent],
+      clearSelectedConversation: true,
+      messages: const [],
     ));
-    final agentsResult = await _getAgentsUseCase(const NoParams());
 
-    await agentsResult.fold(
-      (failure) async {
-        emit(state.copyWith(
-          status: IraStatus.failure,
-          suggestionsStatus: IraStatus.failure,
-          errorMessage: failure.message,
-        ));
+    final welcomeResult = await _getWelcomeMessageUseCase(defaultAgent.name);
+    final chatsResult = await _getChatHistoryUseCase(defaultAgent.id);
+    final filesResult = await _getFilesUseCase(defaultAgent.id);
+    final suggestionsResult = await _getWelcomeSuggestionsUseCase(
+      WelcomeSuggestionsParams(
+        assistantId: defaultAgent.id,
+        assistantName: defaultAgent.name,
+      ),
+    );
+
+    String welcomeMsg = '';
+    welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);
+
+    List<IraConversation> conversations = [];
+    chatsResult.fold((_) {}, (list) => conversations = list);
+
+    List<IraFile> files = [];
+    IraStatus filesStatus = IraStatus.failure;
+    filesResult.fold(
+      (failure) => filesStatus = IraStatus.failure,
+      (list) {
+        files = list;
+        filesStatus = IraStatus.success;
       },
-      (agents) async {
-        if (agents.isNotEmpty) {
-          final firstAgent = agents.first;
+    );
 
-          final welcomeResult = await _getWelcomeMessageUseCase(firstAgent.name);
-          final chatsResult = await _getChatHistoryUseCase(firstAgent.id);
-          final filesResult = await _getFilesUseCase(firstAgent.id);
-          final suggestionsResult = await _getWelcomeSuggestionsUseCase(
-            WelcomeSuggestionsParams(
-              assistantId: firstAgent.id,
-              assistantName: firstAgent.name,
-            ),
-          );
+    List<String> suggestions = [];
+    List<String> liveConnectors = [];
+    IraStatus suggestionsStatus = IraStatus.failure;
+    suggestionsResult.fold(
+      (_) => suggestionsStatus = IraStatus.failure,
+      (ws) {
+        suggestions = ws.suggestions;
+        liveConnectors = ws.liveConnectors;
+        suggestionsStatus = IraStatus.success;
+      },
+    );
 
-          String welcomeMsg = '';
-          welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);
+    emit(state.copyWith(
+      status: IraStatus.success,
+      selectedAgent: defaultAgent,
+      welcomeMessage: welcomeMsg,
+      messages: const [],
+      files: files,
+      filteredFiles: files,
+      searchQuery: '',
+      suggestions: suggestions,
+      suggestionsStatus: suggestionsStatus,
+      liveConnectors: liveConnectors,
+      conversations: conversations,
+      historyStatus: IraStatus.success,
+      filesStatus: filesStatus,
+      clearSelectedConversation: true,
+    ));
+  }
 
-          List<IraMessage> messages = [];
-          chatsResult.fold((_) {}, (list) => messages = list);
-
-          List<IraFile> files = [];
-          filesResult.fold((_) {}, (list) => files = list);
-
-          List<String> suggestions = [];
-          IraStatus suggestionsStatus = IraStatus.failure;
-          suggestionsResult.fold(
-            (_) => suggestionsStatus = IraStatus.failure,
-            (ws) {
-              suggestions = ws.suggestions;
-              suggestionsStatus = IraStatus.success;
-            },
-          );
-
-          emit(state.copyWith(
-            status: IraStatus.success,
-            agents: agents,
-            selectedAgent: firstAgent,
-            welcomeMessage: welcomeMsg,
-            messages: messages,
-            files: files,
-            filteredFiles: files,
-            searchQuery: '',
-            suggestions: suggestions,
-            suggestionsStatus: suggestionsStatus,
-          ));
-        } else {
-          emit(state.copyWith(
-            status: IraStatus.success,
-            agents: const [],
-            selectedAgent: null,
-            suggestions: const [],
-            suggestionsStatus: IraStatus.success,
-          ));
-        }
+  Future<void> _onIraLoadAgents(
+    IraLoadAgents event,
+    Emitter<IraState> emit,
+  ) async {
+    final agentsResult = await _getAgentsUseCase(const NoParams());
+    agentsResult.fold(
+      (_) {},
+      (agents) {
+        emit(state.copyWith(
+          agents: agents,
+        ));
       },
     );
   }
@@ -119,12 +147,16 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     emit(state.copyWith(
       status: IraStatus.loading,
       suggestionsStatus: IraStatus.loading,
+      historyStatus: IraStatus.loading,
+      filesStatus: IraStatus.loading,
       selectedAgent: event.agent,
       messages: const [],
       files: const [],
       filteredFiles: const [],
       searchQuery: '',
       suggestions: const [],
+      liveConnectors: const [],
+      clearSelectedConversation: true,
     ));
 
     final welcomeResult = await _getWelcomeMessageUseCase(event.agent.name);
@@ -140,18 +172,27 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     String welcomeMsg = '';
     welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);
 
-    List<IraMessage> messages = [];
-    chatsResult.fold((_) {}, (list) => messages = list);
+    List<IraConversation> conversations = [];
+    chatsResult.fold((_) {}, (list) => conversations = list);
 
     List<IraFile> files = [];
-    filesResult.fold((_) {}, (list) => files = list);
+    IraStatus filesStatus = IraStatus.failure;
+    filesResult.fold(
+      (failure) => filesStatus = IraStatus.failure,
+      (list) {
+        files = list;
+        filesStatus = IraStatus.success;
+      },
+    );
 
     List<String> suggestions = [];
+    List<String> liveConnectors = [];
     IraStatus suggestionsStatus = IraStatus.failure;
     suggestionsResult.fold(
       (_) => suggestionsStatus = IraStatus.failure,
       (ws) {
         suggestions = ws.suggestions;
+        liveConnectors = ws.liveConnectors;
         suggestionsStatus = IraStatus.success;
       },
     );
@@ -159,11 +200,76 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     emit(state.copyWith(
       status: IraStatus.success,
       welcomeMessage: welcomeMsg,
-      messages: messages,
+      messages: const [],
       files: files,
       filteredFiles: files,
       suggestions: suggestions,
       suggestionsStatus: suggestionsStatus,
+      liveConnectors: liveConnectors,
+      conversations: conversations,
+      historyStatus: IraStatus.success,
+      filesStatus: filesStatus,
+      clearSelectedConversation: true,
+    ));
+  }
+
+  Future<void> _onIraLoadConversations(
+    IraLoadConversations event,
+    Emitter<IraState> emit,
+  ) async {
+    final agent = state.selectedAgent;
+    if (agent == null) return;
+
+    emit(state.copyWith(historyStatus: IraStatus.loading));
+    final chatsResult = await _getChatHistoryUseCase(agent.id);
+    chatsResult.fold(
+      (failure) => emit(state.copyWith(historyStatus: IraStatus.failure)),
+      (conversations) => emit(state.copyWith(
+        conversations: conversations,
+        historyStatus: IraStatus.success,
+      )),
+    );
+  }
+
+  Future<void> _onIraSelectConversation(
+    IraSelectConversation event,
+    Emitter<IraState> emit,
+  ) async {
+    emit(state.copyWith(
+      selectedConversation: event.conversation,
+      messagesStatus: IraStatus.loading,
+      messages: const [],
+    ));
+
+    final result = await _getConversationMessagesUseCase(event.conversation.id);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          messagesStatus: IraStatus.failure,
+          errorMessage: failure.message,
+        ));
+      },
+      (messages) {
+        // Sort chronologically (oldest messages first, newest last)
+        final sortedMessages = List<IraMessage>.from(messages)
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+        emit(state.copyWith(
+          messagesStatus: IraStatus.success,
+          messages: sortedMessages,
+        ));
+      },
+    );
+  }
+
+  Future<void> _onIraCreateNewConversation(
+    IraCreateNewConversation event,
+    Emitter<IraState> emit,
+  ) async {
+    emit(state.copyWith(
+      clearSelectedConversation: true,
+      messages: const [],
+      messagesStatus: IraStatus.initial,
     ));
   }
 
@@ -173,6 +279,7 @@ class IraBloc extends Bloc<IraEvent, IraState> {
   ) async {
     final agent = state.selectedAgent;
     if (agent == null || event.text.trim().isEmpty) return;
+    if (state.isSending) return;
 
     final userMsg = IraMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -191,6 +298,8 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     final sendResult = await _sendMessageUseCase(SendMessageParams(
       agentId: agent.id,
       text: event.text,
+      chatId: state.selectedConversation?.id,
+      userEmail: event.userEmail,
     ));
 
     sendResult.fold(
@@ -202,9 +311,37 @@ class IraBloc extends Bloc<IraEvent, IraState> {
       },
       (reply) {
         final finalMessages = List<IraMessage>.from(state.messages)..add(reply);
+        
+        // Handle new conversation creation or existing conversation updates
+        final currentConv = state.selectedConversation;
+        List<IraConversation> updatedConvs = List.from(state.conversations);
+        IraConversation? nextSelectedConv = currentConv;
+
+        if (currentConv == null && reply.chatId != null) {
+          final newConv = IraConversation(
+            id: reply.chatId!,
+            title: event.text,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            assistantId: agent.id,
+          );
+          updatedConvs.insert(0, newConv);
+          nextSelectedConv = newConv;
+        } else if (currentConv != null) {
+          final index = updatedConvs.indexWhere((c) => c.id == currentConv.id);
+          final updatedConv = currentConv.copyWith(updatedAt: DateTime.now());
+          if (index != -1) {
+            updatedConvs.removeAt(index);
+          }
+          updatedConvs.insert(0, updatedConv);
+          nextSelectedConv = updatedConv;
+        }
+
         emit(state.copyWith(
           isSending: false,
           messages: finalMessages,
+          conversations: updatedConvs,
+          selectedConversation: nextSelectedConv,
         ));
       },
     );
@@ -236,5 +373,32 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     Emitter<IraState> emit,
   ) {
     emit(state.copyWith(activeTab: event.tabIndex));
+  }
+
+  Future<void> _onIraLoadFiles(
+    IraLoadFiles event,
+    Emitter<IraState> emit,
+  ) async {
+    emit(state.copyWith(
+      filesStatus: IraStatus.loading,
+    ));
+
+    final filesResult = await _getFilesUseCase(event.agentId);
+
+    List<IraFile> files = [];
+    IraStatus filesStatus = IraStatus.failure;
+    filesResult.fold(
+      (failure) => filesStatus = IraStatus.failure,
+      (list) {
+        files = list;
+        filesStatus = IraStatus.success;
+      },
+    );
+
+    emit(state.copyWith(
+      files: files,
+      filteredFiles: files,
+      filesStatus: filesStatus,
+    ));
   }
 }

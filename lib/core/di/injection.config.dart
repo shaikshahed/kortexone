@@ -35,6 +35,8 @@ import '../../features/ira/domain/repositories/ira_repository.dart' as _i714;
 import '../../features/ira/domain/usecases/get_agents_usecase.dart' as _i395;
 import '../../features/ira/domain/usecases/get_chat_history_usecase.dart'
     as _i799;
+import '../../features/ira/domain/usecases/get_conversation_messages_usecase.dart'
+    as _i535;
 import '../../features/ira/domain/usecases/get_files_usecase.dart' as _i561;
 import '../../features/ira/domain/usecases/get_welcome_message_usecase.dart'
     as _i58;
@@ -105,6 +107,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i799.GetChatHistoryUseCase>(
       () => _i799.GetChatHistoryUseCase(gh<_i714.IraRepository>()),
     );
+    gh.factory<_i535.GetConversationMessagesUseCase>(
+      () => _i535.GetConversationMessagesUseCase(gh<_i714.IraRepository>()),
+    );
     gh.factory<_i561.GetFilesUseCase>(
       () => _i561.GetFilesUseCase(gh<_i714.IraRepository>()),
     );
@@ -131,6 +136,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i561.GetFilesUseCase>(),
         gh<_i730.SendMessageUseCase>(),
         gh<_i564.GetWelcomeSuggestionsUseCase>(),
+        gh<_i535.GetConversationMessagesUseCase>(),
       ),
     );
     gh.lazySingleton<_i188.LoginUseCase>(
