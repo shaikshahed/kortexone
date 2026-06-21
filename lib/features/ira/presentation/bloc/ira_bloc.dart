@@ -1,10 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/ira_message.dart';
 import '../../domain/entities/ira_file.dart';
 import '../../domain/entities/ira_agent.dart';
 import '../../domain/entities/ira_conversation.dart';
+import '../../domain/entities/welcome_suggestions.dart';
 import '../../domain/usecases/get_agents_usecase.dart';
 import '../../domain/usecases/get_welcome_message_usecase.dart';
 import '../../domain/usecases/get_chat_history_usecase.dart';
@@ -69,15 +72,22 @@ class IraBloc extends Bloc<IraEvent, IraState> {
       messages: const [],
     ));
 
-    final welcomeResult = await _getWelcomeMessageUseCase(defaultAgent.name);
-    final chatsResult = await _getChatHistoryUseCase(defaultAgent.id);
-    final filesResult = await _getFilesUseCase(defaultAgent.id);
-    final suggestionsResult = await _getWelcomeSuggestionsUseCase(
-      WelcomeSuggestionsParams(
-        assistantId: defaultAgent.id,
-        assistantName: defaultAgent.name,
+    final results = await Future.wait([
+      _getWelcomeMessageUseCase(defaultAgent.name),
+      _getChatHistoryUseCase(defaultAgent.id),
+      _getFilesUseCase(defaultAgent.id),
+      _getWelcomeSuggestionsUseCase(
+        WelcomeSuggestionsParams(
+          assistantId: defaultAgent.id,
+          assistantName: defaultAgent.name,
+        ),
       ),
-    );
+    ]);
+
+    final welcomeResult = results[0] as Either<Failure, String>;
+    final chatsResult = results[1] as Either<Failure, List<IraConversation>>;
+    final filesResult = results[2] as Either<Failure, List<IraFile>>;
+    final suggestionsResult = results[3] as Either<Failure, WelcomeSuggestions>;
 
     String welcomeMsg = '';
     welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);
@@ -159,15 +169,22 @@ class IraBloc extends Bloc<IraEvent, IraState> {
       clearSelectedConversation: true,
     ));
 
-    final welcomeResult = await _getWelcomeMessageUseCase(event.agent.name);
-    final chatsResult = await _getChatHistoryUseCase(event.agent.id);
-    final filesResult = await _getFilesUseCase(event.agent.id);
-    final suggestionsResult = await _getWelcomeSuggestionsUseCase(
-      WelcomeSuggestionsParams(
-        assistantId: event.agent.id,
-        assistantName: event.agent.name,
+    final results = await Future.wait([
+      _getWelcomeMessageUseCase(event.agent.name),
+      _getChatHistoryUseCase(event.agent.id),
+      _getFilesUseCase(event.agent.id),
+      _getWelcomeSuggestionsUseCase(
+        WelcomeSuggestionsParams(
+          assistantId: event.agent.id,
+          assistantName: event.agent.name,
+        ),
       ),
-    );
+    ]);
+
+    final welcomeResult = results[0] as Either<Failure, String>;
+    final chatsResult = results[1] as Either<Failure, List<IraConversation>>;
+    final filesResult = results[2] as Either<Failure, List<IraFile>>;
+    final suggestionsResult = results[3] as Either<Failure, WelcomeSuggestions>;
 
     String welcomeMsg = '';
     welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../config/app_config.dart';
 import '../../services/logging/logger_service.dart';
 
 class ApiInterceptor extends Interceptor {
@@ -11,10 +12,12 @@ class ApiInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     try {
-      final curl = _toCurl(options);
-      debugPrint('\n┌─────────────────── API REQUEST (CURL) ───────────────────');
-      debugPrint(curl);
-      debugPrint('└──────────────────────────────────────────────────────────\n');
+      if (kDebugMode && AppConfig.enableLogging) {
+        final curl = _toCurl(options);
+        debugPrint('\n┌─────────────────── API REQUEST (CURL) ───────────────────');
+        debugPrint(curl);
+        debugPrint('└──────────────────────────────────────────────────────────\n');
+      }
     } catch (e) {
       _logger.error('Failed to generate CURL: $e');
     }
@@ -25,27 +28,29 @@ class ApiInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     try {
-      debugPrint('\n┌─────────────────── API RESPONSE ───────────────────');
-      debugPrint('Status Code: ${response.statusCode}');
-      debugPrint('Method: ${response.requestOptions.method}');
-      debugPrint('URL: ${response.requestOptions.uri}');
-      
-      final headers = response.headers.map;
-      if (headers.isNotEmpty) {
-        debugPrint('Headers:');
-        headers.forEach((k, v) => debugPrint('  $k: ${v.join(', ')}'));
-      }
-
-      if (response.data != null) {
-        debugPrint('Response Body:');
-        if (response.data is Map || response.data is List) {
-          final prettyJson = const JsonEncoder.withIndent('  ').convert(response.data);
-          debugPrint(prettyJson);
-        } else {
-          debugPrint(response.data.toString());
+      if (kDebugMode && AppConfig.enableLogging) {
+        debugPrint('\n┌─────────────────── API RESPONSE ───────────────────');
+        debugPrint('Status Code: ${response.statusCode}');
+        debugPrint('Method: ${response.requestOptions.method}');
+        debugPrint('URL: ${response.requestOptions.uri}');
+        
+        final headers = response.headers.map;
+        if (headers.isNotEmpty) {
+          debugPrint('Headers:');
+          headers.forEach((k, v) => debugPrint('  $k: ${v.join(', ')}'));
         }
+
+        if (response.data != null) {
+          debugPrint('Response Body:');
+          if (response.data is Map || response.data is List) {
+            final prettyJson = const JsonEncoder.withIndent('  ').convert(response.data);
+            debugPrint(prettyJson);
+          } else {
+            debugPrint(response.data.toString());
+          }
+        }
+        debugPrint('└────────────────────────────────────────────────────\n');
       }
-      debugPrint('└────────────────────────────────────────────────────\n');
     } catch (e) {
       _logger.error('Failed to print response: $e');
     }
@@ -56,25 +61,27 @@ class ApiInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     try {
-      debugPrint('\n┌─────────────────── API ERROR ───────────────────');
-      debugPrint('Error: ${err.message}');
-      debugPrint('Method: ${err.requestOptions.method}');
-      debugPrint('URL: ${err.requestOptions.uri}');
-      
-      final response = err.response;
-      if (response != null) {
-        debugPrint('Status Code: ${response.statusCode}');
-        if (response.data != null) {
-          debugPrint('Error Response Body:');
-          if (response.data is Map || response.data is List) {
-            final prettyJson = const JsonEncoder.withIndent('  ').convert(response.data);
-            debugPrint(prettyJson);
-          } else {
-            debugPrint(response.data.toString());
+      if (kDebugMode && AppConfig.enableLogging) {
+        debugPrint('\n┌─────────────────── API ERROR ───────────────────');
+        debugPrint('Error: ${err.message}');
+        debugPrint('Method: ${err.requestOptions.method}');
+        debugPrint('URL: ${err.requestOptions.uri}');
+        
+        final response = err.response;
+        if (response != null) {
+          debugPrint('Status Code: ${response.statusCode}');
+          if (response.data != null) {
+            debugPrint('Error Response Body:');
+            if (response.data is Map || response.data is List) {
+              final prettyJson = const JsonEncoder.withIndent('  ').convert(response.data);
+              debugPrint(prettyJson);
+            } else {
+              debugPrint(response.data.toString());
+            }
           }
         }
+        debugPrint('└─────────────────────────────────────────────────\n');
       }
-      debugPrint('└─────────────────────────────────────────────────\n');
     } catch (e) {
       _logger.error('Failed to print error: $e');
     }
