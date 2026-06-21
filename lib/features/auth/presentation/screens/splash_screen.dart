@@ -158,25 +158,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 ),
               ),
             ),
-
-            // Circular progress at the bottom
-            Positioned(
-              bottom: 60,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryLight.withOpacity(0.5),
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
