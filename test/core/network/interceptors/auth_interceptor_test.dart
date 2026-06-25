@@ -15,7 +15,6 @@ void main() {
   late MockSecureStorageService mockSecureStorage;
   late MockRequestInterceptorHandler mockRequestHandler;
   late MockResponseInterceptorHandler mockResponseHandler;
-  late MockErrorInterceptorHandler mockErrorHandler;
 
   setUpAll(() {
     registerFallbackValue(RequestOptions(path: '/'));
@@ -32,7 +31,6 @@ void main() {
     mockSecureStorage = MockSecureStorageService();
     mockRequestHandler = MockRequestInterceptorHandler();
     mockResponseHandler = MockResponseInterceptorHandler();
-    mockErrorHandler = MockErrorInterceptorHandler();
     interceptor = AuthInterceptor(mockSecureStorage);
   });
 

@@ -224,7 +224,6 @@ class ChatView extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildSuggestionsArea(context, isDark),
-                // _buildConnectorsArea(context, isDark),
               ],
             ),
           ),
@@ -534,116 +533,7 @@ class ChatView extends StatelessWidget {
     return IraLoadingIndicator(isDark: isDark);
   }
 
-  Widget _buildConnectorsArea(BuildContext context, bool isDark) {
-    if (liveConnectors.isEmpty) {
-      return const SizedBox.shrink();
-    }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: 32),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: const BoxDecoration(
-                color: Color(0xFF10B981),
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'ACTIVE CONNECTORS',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 12,
-          runSpacing: 12,
-          children: liveConnectors.map((connector) {
-            IconData iconData;
-            Color iconColor;
-
-            switch (connector.toLowerCase()) {
-              case 'slack':
-                iconData = Icons.message_outlined;
-                iconColor = const Color(0xFF4A154B);
-                break;
-              case 'google drive':
-              case 'google_drive':
-              case 'gdrive':
-                iconData = Icons.add_to_drive_outlined;
-                iconColor = const Color(0xFF34A853);
-                break;
-              case 'jira':
-                iconData = Icons.assignment_turned_in_outlined;
-                iconColor = const Color(0xFF0052CC);
-                break;
-              case 'github':
-                iconData = Icons.code_rounded;
-                iconColor = isDark ? Colors.white : Colors.black;
-                break;
-              case 'gmail':
-                iconData = Icons.email_outlined;
-                iconColor = const Color(0xFFEA4335);
-                break;
-              default:
-                iconData = Icons.hub_outlined;
-                iconColor = const Color(0xFF8B5CF6);
-            }
-
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withOpacity(0.04)
-                    : Colors.black.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark
-                      ? AppColors.cardBorderDark
-                      : Colors.black.withOpacity(0.06),
-                  width: 1.0,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    iconData,
-                    size: 16,
-                    color: iconColor,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    connector,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? Colors.white.withOpacity(0.85)
-                          : AppColors.textPrimaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
 }
 
 class IraLoadingIndicator extends StatefulWidget {

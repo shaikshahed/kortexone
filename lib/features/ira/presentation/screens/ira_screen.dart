@@ -202,13 +202,13 @@ class _IraScreenState extends State<IraScreen> {
                               ],
                               const Spacer(),
                               // Notifications
-                              IconButton(
-                                icon: Icon(
-                                  Icons.notifications_none_rounded,
-                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                                ),
-                                onPressed: () {},
-                              ),
+                              // IconButton(
+                              //   icon: Icon(
+                              //     Icons.notifications_none_rounded,
+                              //     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              //   ),
+                              //   onPressed: () {},
+                              // ),
                               // Logout
                               IconButton(
                                 icon: const Icon(Icons.logout_rounded),

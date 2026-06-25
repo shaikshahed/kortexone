@@ -113,11 +113,17 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
         isTimerActive: true,
       ));
     } else {
-      add(OtpTimerTicked(seconds));
+      if (!isClosed) {
+        add(OtpTimerTicked(seconds));
+      }
     }
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       seconds--;
-      add(OtpTimerTicked(seconds));
+      if (!isClosed) {
+        add(OtpTimerTicked(seconds));
+      } else {
+        timer.cancel();
+      }
     });
   }
 

@@ -7,7 +7,7 @@ import '../services/storage/secure_storage_service.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/otp_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
+
 import '../../features/ira/presentation/screens/ira_screen.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
@@ -21,8 +21,8 @@ class AppRouter {
   late final GoRouter router = GoRouter(
     initialLocation: RouteNames.root,
     redirect: (BuildContext context, GoRouterState state) async {
-      final hasToken = await _secureStorage.containsKey('access_token');
       final authState = context.read<AuthBloc>().state;
+      final hasToken = await _secureStorage.containsKey('access_token');
       final isAuthenticated = hasToken || authState is AuthAuthenticated;
 
       final onSplash = state.matchedLocation == RouteNames.root;
@@ -66,10 +66,7 @@ class AppRouter {
           );
         },
       ),
-      GoRoute(
-        path: RouteNames.home,
-        builder: (context, state) => const HomeScreen(),
-      ),
+
       GoRoute(
         path: RouteNames.ira,
         builder: (context, state) => const IraScreen(),

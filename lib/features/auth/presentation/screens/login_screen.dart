@@ -238,28 +238,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const SizedBox(height: 12),
 
                                   // Forgot Password Option
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(l10n?.forgotPassword ?? 'Forgot password tapped'),
-                                            behavior: SnackBarBehavior.floating,
-                                          ),
-                                        );
-                                      },
-                                      child: Text(
-                                        l10n?.forgotPassword ?? 'Forgot password?',
-                                        style: TextStyle(
-                                          color: isDark ? AppColors.linkPurple : AppColors.primary,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 32),
+                                  // Align(
+                                  //   alignment: Alignment.centerRight,
+                                  //   child: GestureDetector(
+                                  //     onTap: () {
+                                  //       ScaffoldMessenger.of(context).showSnackBar(
+                                  //         SnackBar(
+                                  //           content: Text(l10n?.forgotPassword ?? 'Forgot password tapped'),
+                                  //           behavior: SnackBarBehavior.floating,
+                                  //         ),
+                                  //       );
+                                  //     },
+                                  //     child: Text(
+                                  //       l10n?.forgotPassword ?? 'Forgot password?',
+                                  //       style: TextStyle(
+                                  //         color: isDark ? AppColors.linkPurple : AppColors.primary,
+                                  //         fontSize: 12,
+                                  //         fontWeight: FontWeight.w600,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  const SizedBox(height: 26),
 
                                   // Sign In Button
                                   BlocBuilder<AuthBloc, AuthState>(
