@@ -93,7 +93,14 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);
 
     List<IraConversation> conversations = [];
-    chatsResult.fold((_) {}, (list) => conversations = list);
+    IraStatus historyStatus = IraStatus.failure;
+    chatsResult.fold(
+      (failure) => historyStatus = IraStatus.failure,
+      (list) {
+        conversations = list;
+        historyStatus = IraStatus.success;
+      },
+    );
 
     List<IraFile> files = [];
     IraStatus filesStatus = IraStatus.failure;
@@ -129,7 +136,7 @@ class IraBloc extends Bloc<IraEvent, IraState> {
       suggestionsStatus: suggestionsStatus,
       liveConnectors: liveConnectors,
       conversations: conversations,
-      historyStatus: IraStatus.success,
+      historyStatus: historyStatus,
       filesStatus: filesStatus,
       clearSelectedConversation: true,
     ));
@@ -190,7 +197,14 @@ class IraBloc extends Bloc<IraEvent, IraState> {
     welcomeResult.fold((_) {}, (msg) => welcomeMsg = msg);
 
     List<IraConversation> conversations = [];
-    chatsResult.fold((_) {}, (list) => conversations = list);
+    IraStatus historyStatus = IraStatus.failure;
+    chatsResult.fold(
+      (failure) => historyStatus = IraStatus.failure,
+      (list) {
+        conversations = list;
+        historyStatus = IraStatus.success;
+      },
+    );
 
     List<IraFile> files = [];
     IraStatus filesStatus = IraStatus.failure;
@@ -224,7 +238,7 @@ class IraBloc extends Bloc<IraEvent, IraState> {
       suggestionsStatus: suggestionsStatus,
       liveConnectors: liveConnectors,
       conversations: conversations,
-      historyStatus: IraStatus.success,
+      historyStatus: historyStatus,
       filesStatus: filesStatus,
       clearSelectedConversation: true,
     ));

@@ -160,6 +160,7 @@ class _IraScreenState extends State<IraScreen> {
                                   });
                                   if (_isSidebarOpen) {
                                     context.read<IraBloc>().add(const IraLoadAgents());
+                                    context.read<IraBloc>().add(const IraLoadConversations());
                                   }
                                 },
                               ),
@@ -452,7 +453,13 @@ class _IraScreenState extends State<IraScreen> {
                                       children: [
                                         _buildNewConversationButton(context, isDark),
                                         Expanded(
-                                          child: _buildHistoryList(state.conversations, state.selectedConversation, context, isDark),
+                                          child: _buildHistoryList(
+                                            state.conversations,
+                                            state.selectedConversation,
+                                            state.historyStatus,
+                                            context,
+                                            isDark,
+                                          ),
                                         ),
                                       ],
                                     )
@@ -608,9 +615,61 @@ class _IraScreenState extends State<IraScreen> {
   Widget _buildHistoryList(
     List<IraConversation> conversations,
     IraConversation? selectedConversation,
+    IraStatus historyStatus,
     BuildContext context,
     bool isDark,
   ) {
+    if (historyStatus == IraStatus.loading && conversations.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: AppColors.primary,
+        ),
+      );
+    }
+
+    if (historyStatus == IraStatus.failure && conversations.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline_rounded,
+                color: AppColors.error,
+                size: 32,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Failed to load history',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<IraBloc>().add(const IraLoadConversations());
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  minimumSize: const Size(100, 36),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (conversations.isEmpty) {
       return Center(
         child: Padding(
